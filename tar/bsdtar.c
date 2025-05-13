@@ -676,6 +676,12 @@ main(int argc, char **argv)
 				}
 			}
 			break;
+		case OPTION_MTIME: /* GNU tar */
+			bsdtar->mtime = bsdtar->argument;
+			break;
+		case OPTION_CLAMP_MTIME: /* GNU tar */
+			bsdtar->clamp_mtime = 1;
+			break;
 #if 0
 		/*
 		 * The common BSD -P option is not necessary, since
@@ -1066,6 +1072,7 @@ static const char *long_help_msg =
 	"  -z, -j, -J, --lzma  Compress archive with gzip/bzip2/xz/lzma\n"
 	"  --format {ustar|pax|cpio|shar}  Select archive format\n"
 	"  --exclude <pattern>  Skip files that match pattern\n"
+	"  --mtime <date>  Set modification times for added files\n"
 	"  -C <dir>  Change to <dir> before processing remaining files\n"
 	"  @<archive>  Add entries from <archive> to output\n"
 	"List: %p -t [options] [<patterns>]\n"

@@ -46,6 +46,8 @@ struct bsdtar {
 	char		  symlink_mode; /* H or L, per BSD conventions */
 	const char	 *option_options; /* --options */
 	char		  day_first; /* show day before month in -tv output */
+	const char	*mtime; /* --mtime */
+	char		clamp_mtime; /* --clamp-mtime */
 	struct creation_set *cset;
 
 	/* Option parser state */
@@ -175,6 +177,8 @@ enum {
 	OPTION_VERSION,
 	OPTION_XATTRS,
 	OPTION_ZSTD,
+	OPTION_MTIME,
+	OPTION_CLAMP_MTIME,
 };
 
 int	bsdtar_getopt(struct bsdtar *);
