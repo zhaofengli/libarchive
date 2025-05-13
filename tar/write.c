@@ -465,6 +465,11 @@ write_archive(struct archive *a, struct bsdtar *bsdtar)
 	    bsdtar->readdisk_flags);
 	archive_read_disk_set_standard_lookup(bsdtar->diskreader);
 
+	if (bsdtar->mtime != NULL) {
+		if (archive_read_disk_set_forced_mtime_str(bsdtar->diskreader, bsdtar->mtime, bsdtar->clamp_mtime) != ARCHIVE_OK)
+			lafe_errc(1, 0, "Error : %s", archive_error_string(bsdtar->diskreader));
+	}
+
 	if (bsdtar->names_from_file != NULL)
 		archive_names_from_file(bsdtar, a);
 
