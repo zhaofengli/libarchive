@@ -450,6 +450,7 @@ libarchive_test_SOURCES= \
 	libarchive/test/test_read_disk.c \
 	libarchive/test/test_read_disk_directory_traversals.c \
 	libarchive/test/test_read_disk_entry_from_file.c \
+	libarchive/test/test_read_disk_forced_mtime.c \
 	libarchive/test/test_read_extract.c \
 	libarchive/test/test_read_file_nonexistent.c \
 	libarchive/test/test_read_filter_compress.c \
