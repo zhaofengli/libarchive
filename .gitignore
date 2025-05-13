@@ -96,3 +96,17 @@ test-suite.log
 .*.sw?
 
 *.pdb
+
+# nix
+.direnv
+.vscode
+
+result*
+
+*.o
+*.out
+
+*~
+*.swp
+
+.cache
