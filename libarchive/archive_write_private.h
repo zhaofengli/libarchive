@@ -107,6 +107,14 @@ struct archive_write {
 	struct archive_write_filter *filter_last;
 
 	/*
+	 * Forced modification time (mtime).
+	 */
+	time_t	 now;
+	char	has_forced_mtime; /* Either 0 or 1. */
+	char	clamp_forced_mtime; /* Either 0 or 1. */
+	__LA_TIME_T	forced_mtime;
+
+	/*
 	 * Pointers to format-specific functions for writing.  They're
 	 * initialized by archive_write_set_format_XXX() calls.
 	 */

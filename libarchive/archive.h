@@ -796,6 +796,25 @@ __LA_DECL int archive_write_get_bytes_in_last_block(struct archive *);
 __LA_DECL int archive_write_set_skip_file(struct archive *,
     la_int64_t, la_int64_t);
 
+/*
+ * Set the forced modification time to be applied to all written files.
+ * If clamp is not 0, the given timestamp will only be applied if the file
+ * is newer than it.
+ */
+__LA_DECL int	archive_write_set_forced_mtime(struct archive *,
+		    __LA_TIME_T mtime, char clamp);
+
+/*
+ * Set the forced modification time to be applied to all written files.
+ * If clamp is not 0, the given timestamp will only be applied if the file
+ * is newer than it.
+ *
+ * Same as archive_write_set_forced_mtime, except the timestamp is parsed
+ * from a C string with libarchive-specific semantics.
+ */
+__LA_DECL int	archive_write_set_forced_mtime_str(struct archive *,
+		    const char *datestr, char clamp);
+
 #if ARCHIVE_VERSION_NUMBER < 4000000
 __LA_DECL int archive_write_set_compression_bzip2(struct archive *)
 		__LA_DEPRECATED;

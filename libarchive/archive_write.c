@@ -56,8 +56,11 @@
 
 #include "archive.h"
 #include "archive_entry.h"
+#include "archive_getdate.h"
 #include "archive_private.h"
 #include "archive_write_private.h"
+
+#define get_date __archive_get_date
 
 static int	_archive_filter_code(struct archive *, int);
 static const char *_archive_filter_name(struct archive *, int);
@@ -120,6 +123,11 @@ archive_write_new(void)
 		return (NULL);
 	}
 	a->nulls = nulls;
+
+	time(&a->now);
+	a->has_forced_mtime = 0;
+	a->clamp_forced_mtime = 0;
+
 	return (&a->archive);
 }
 
@@ -197,6 +205,38 @@ archive_write_set_skip_file(struct archive *_a, la_int64_t d, la_int64_t i)
 	a->skip_file_dev = d;
 	a->skip_file_ino = i;
 	return (ARCHIVE_OK);
+}
+
+int
+archive_write_set_forced_mtime(struct archive *_a,
+	__LA_TIME_T mtime, char clamp)
+{
+	struct archive_write *a = (struct archive_write *)_a;
+	a->has_forced_mtime = 1;
+	a->clamp_forced_mtime = clamp;
+	a->forced_mtime = mtime;
+	return (ARCHIVE_OK);
+}
+
+int
+archive_write_set_forced_mtime_str(struct archive *_a,
+	const char *datestr, char clamp)
+{
+	struct archive_write *a = (struct archive_write *)_a;
+	time_t t;
+
+	if (datestr == NULL || *datestr == '\0') {
+		archive_set_error(&(a->archive), EINVAL, "date is empty");
+		return (ARCHIVE_FAILED);
+	}
+
+	t = get_date(a->now, datestr);
+	if (t == (time_t)-1) {
+		archive_set_error(&(a->archive), EINVAL, "invalid date string");
+		return (ARCHIVE_FAILED);
+	}
+
+	return archive_write_set_forced_mtime(_a, t, clamp);
 }
 
 /*
@@ -778,6 +818,14 @@ _archive_write_header(struct archive *_a, struct archive_entry *entry)
 	}
 	if (r2 < ret)
 		ret = r2;
+
+	/* Apply forced modification time */
+	if (a->has_forced_mtime) {
+		__LA_TIME_T real_time = archive_entry_mtime(entry);
+		if (!a->clamp_forced_mtime || real_time > a->forced_mtime) {
+			archive_entry_set_mtime(entry, a->forced_mtime, 0);
+		}
+	}
 
 	/* Format and write header. */
 	r2 = ((a->format_write_header)(a, entry));
