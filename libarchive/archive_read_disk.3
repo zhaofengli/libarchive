@@ -45,6 +45,8 @@
 .Nm archive_read_disk_current_filesystem_is_synthetic ,
 .Nm archive_read_disk_current_filesystem_is_remote ,
 .Nm archive_read_disk_set_matching ,
+.Nm archive_read_disk_set_forced_mtime ,
+.Nm archive_read_disk_set_forced_mtime_str ,
 .Nm archive_read_disk_set_metadata_filter_callback ,
 .Nd functions for reading objects from disk
 .Sh LIBRARY
@@ -108,6 +110,18 @@ Streaming Archive Library (libarchive, -larchive)
 .Fa "struct archive *"
 .Fa "void (*excluded_func)(struct archive *, void *, struct archive entry *)"
 .Fa "void *"
+.Fc
+.Ft int
+.Fo archive_read_disk_set_forced_mtime
+.Fa "struct archive *"
+.Fa time_t
+.Fa char
+.Fc
+.Ft int
+.Fo archive_read_disk_set_forced_mtime_str
+.Fa "struct archive *"
+.Fa "const char *"
+.Fa char
 .Fc
 .Ft int 
 .Fo archive_read_disk_set_metadata_filter_callback
@@ -289,6 +303,17 @@ calls. If matched based on calls to
 or
 .Tn archive_match_owner_excluded ,
 then the callback function specified by the _excluded_func parameter will execute. This function will receive data provided to the fourth parameter, void *_client_data.
+.It Fn archive_read_disk_set_forced_mtime
+Allows the caller to set a forced modification time to be applied to all read files. If
+.Tn clamp
+is not 0, the given timestamp will only be applied if the file is newer than it.
+.It Fn archive_read_disk_set_forced_mtime_str
+Allows the caller to set a forced modification time to be applied to all read files. If
+.Tn clamp
+is not 0, the given timestamp will only be applied if the file is newer than it.
+This function is the same as
+.Tn archive_read_disk_set_forced_mtime
+but accepts a C string containing a date.
 .It Fn archive_read_disk_set_metadata_filter_callback
 Allows the caller to set a callback function during calls to
 .Xr archive_read_header 3
