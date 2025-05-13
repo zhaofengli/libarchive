@@ -1089,6 +1089,26 @@ __LA_DECL int	archive_read_disk_set_matching(struct archive *,
 		    struct archive *_matching, void (*_excluded_func)
 		    (struct archive *, void *, struct archive_entry *),
 		    void *_client_data);
+
+/*
+ * Set the forced modification time to be applied to all read files.
+ * If clamp is not 0, the given timestamp will only be applied if the file
+ * is newer than it.
+ */
+__LA_DECL int	archive_read_disk_set_forced_mtime(struct archive *,
+		    __LA_TIME_T mtime, char clamp);
+
+/*
+ * Set the forced modification time to be applied to all read files.
+ * If clamp is not 0, the given timestamp will only be applied if the file
+ * is newer than it.
+ *
+ * Same as archive_read_disk_set_mtime, except the timestamp is parsed
+ * from a C string with libarchive-specific semantics.
+ */
+__LA_DECL int	archive_read_disk_set_forced_mtime_str(struct archive *,
+		    const char *datestr, char clamp);
+
 __LA_DECL int	archive_read_disk_set_metadata_filter_callback(struct archive *,
 		    int (*_metadata_filter_func)(struct archive *, void *,
 		    	struct archive_entry *), void *_client_data);

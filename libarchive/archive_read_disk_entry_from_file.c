@@ -212,6 +212,14 @@ archive_read_disk_entry_from_file(struct archive *_a,
 	if (name != NULL)
 		archive_entry_copy_gname(entry, name);
 
+	/* Apply forced modification time */
+	if (a->has_forced_mtime) {
+		__LA_TIME_T real_time = archive_entry_mtime(entry);
+		if (!a->clamp_forced_mtime || real_time > a->forced_mtime) {
+			archive_entry_set_mtime(entry, a->forced_mtime, 0);
+		}
+	}
+
 #ifdef HAVE_STRUCT_STAT_ST_FLAGS
 	/* On FreeBSD, we get flags for free with the stat. */
 	/* TODO: Does this belong in copy_stat()? */

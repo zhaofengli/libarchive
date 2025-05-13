@@ -85,6 +85,11 @@ struct archive_read_disk {
 	void	(*excluded_cb_func)(struct archive *, void *,
 			 struct archive_entry *);
 	void	*excluded_cb_data;
+
+	time_t	 now;
+	char	has_forced_mtime; /* Either 0 or 1. */
+	char	clamp_forced_mtime; /* Either 0 or 1. */
+	__LA_TIME_T	forced_mtime;
 };
 
 const char *

@@ -94,6 +94,7 @@
 #include "archive.h"
 #include "archive_string.h"
 #include "archive_entry.h"
+#include "archive_getdate.h"
 #include "archive_private.h"
 #include "archive_read_disk_private.h"
 
@@ -111,6 +112,8 @@
 #define dirfd(x) ((x)->__dd_fd)
 #define HAVE_DIRFD
 #endif
+
+#define get_date __archive_get_date
 
 /*-
  * This is a new directory-walking system that addresses a number
@@ -464,6 +467,9 @@ archive_read_disk_new(void)
 	a->open_on_current_dir = open_on_current_dir;
 	a->tree_current_dir_fd = tree_current_dir_fd;
 	a->tree_enter_working_dir = tree_enter_working_dir;
+	time(&a->now);
+	a->has_forced_mtime = 0;
+	a->clamp_forced_mtime = 0;
 	return (&a->archive);
 }
 
@@ -1242,6 +1248,38 @@ archive_read_disk_set_matching(struct archive *_a, struct archive *_ma,
 	a->excluded_cb_func = _excluded_func;
 	a->excluded_cb_data = _client_data;
 	return (ARCHIVE_OK);
+}
+
+int
+archive_read_disk_set_forced_mtime(struct archive *_a,
+	__LA_TIME_T mtime, char clamp)
+{
+	struct archive_read_disk *a = (struct archive_read_disk *)_a;
+	a->has_forced_mtime = 1;
+	a->clamp_forced_mtime = clamp;
+	a->forced_mtime = mtime;
+	return (ARCHIVE_OK);
+}
+
+int
+archive_read_disk_set_forced_mtime_str(struct archive *_a,
+	const char *datestr, char clamp)
+{
+	struct archive_read_disk *a = (struct archive_read_disk *)_a;
+	time_t t;
+
+	if (datestr == NULL || *datestr == '\0') {
+		archive_set_error(&(a->archive), EINVAL, "date is empty");
+		return (ARCHIVE_FAILED);
+	}
+
+	t = get_date(a->now, datestr);
+	if (t == (time_t)-1) {
+		archive_set_error(&(a->archive), EINVAL, "invalid date string");
+		return (ARCHIVE_FAILED);
+	}
+
+	return archive_read_disk_set_forced_mtime(_a, t, clamp);
 }
 
 int
